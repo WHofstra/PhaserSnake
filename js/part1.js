@@ -1,7 +1,9 @@
+const scale = [ 800, 600 ];
+
 var config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: window.innerWidth,
+    height: window.innerHeight,
     physics: {
         default: 'arcade',
         arcade: {
@@ -32,11 +34,11 @@ function preload ()
 function create ()
 {
   //Background
-  this.add.image(400, 300, 'sky');
+  this.add.image(config.width / 2, config.height / 2, 'sky');
 
   //Platforms
   platforms = this.physics.add.staticGroup();
-  platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+  platforms.create((400 / scale[0]) * config.width, (568 / scale[1]) * config.height, 'ground').setScale(2).refreshBody();
   platforms.create(50, 250, 'ground');
   platforms.create(750, 220, 'ground');
 
