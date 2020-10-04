@@ -7,7 +7,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            gravity: { y: (300 / scale[1]) * window.innerHeight },
             debug: false
         }
     },
@@ -19,7 +19,7 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-var platforms, player, cursors, stars;
+var platforms, player, cursors, stars, background;
 
 function preload ()
 {
@@ -34,13 +34,21 @@ function preload ()
 function create ()
 {
   //Background
-  this.add.image(config.width / 2, config.height / 2, 'sky');
+  background = this.add.image(config.width / 2, config.height / 2, 'sky');
+  background.setScale((background.scaleX / scale[0]) * config.width,
+                      (background.scaleY / scale[1]) * config.height);
 
   //Platforms
   platforms = this.physics.add.staticGroup();
-  platforms.create((400 / scale[0]) * config.width, (568 / scale[1]) * config.height, 'ground').setScale(2).refreshBody();
-  platforms.create(50, 250, 'ground');
-  platforms.create(750, 220, 'ground');
+  platforms.create((400 / scale[0]) * config.width,
+                   (568 / scale[1]) * config.height, 'ground').setScale((2 / scale[0]) * config.width,
+                   (2 / scale[1])   * config.height).refreshBody();
+  platforms.create((50 / scale[0])  * config.width,
+                   (250 / scale[1]) * config.height, 'ground').setScale((1 / scale[0]) * config.width,
+                   (1 / scale[1])   * config.height).refreshBody();
+  platforms.create((750 / scale[0]) * config.width,
+                   (220 / scale[1]) * config.height, 'ground').setScale((1 / scale[0]) * config.width,
+                   (1 / scale[1])   * config.height).refreshBody();
 
   //Player
   InitPlayer(this);
@@ -55,7 +63,6 @@ function create ()
 
   //Key Input
   cursors = this.input.keyboard.createCursorKeys();
-  //console.log(cursors);
 }
 
 function update ()
@@ -65,7 +72,11 @@ function update ()
 
 function InitPlayer(scene)
 {
-  player = scene.physics.add.sprite(100, 450, 'player');
+  player = scene.physics.add.sprite((100 / scale[0]) * config.width,
+                                    (450 / scale[1]) * config.height, 'player');
+
+  player.setScale((player.scaleX / scale[0]) * config.width,
+                  (player.scaleY / scale[1]) * config.height);
 
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
@@ -101,6 +112,8 @@ function InitStars(scene)
 
   stars.children.iterate(function (child) {
     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    child.setScale((child.scaleX / scale[0]) * config.width,
+                   (child.scaleY / scale[1]) * config.height);
   });
 }
 
@@ -112,11 +125,11 @@ function CollectStar(player, star)
 function KeyInput()
 {
   if (cursors.left.isDown && !cursors.right.isDown) {
-    player.setVelocityX(-160);
+    player.setVelocityX(-(160 / scale[0]) * config.width);
     player.anims.play('left', true);
   }
   else if (cursors.right.isDown && !cursors.left.isDown) {
-    player.setVelocityX(160);
+    player.setVelocityX((160 / scale[0]) * config.width);
     player.anims.play('right', true);
   }
   else {
@@ -125,6 +138,6 @@ function KeyInput()
   }
 
   if (cursors.up.isDown && player.body.touching.down) {
-    player.setVelocityY(-330);
+    player.setVelocityY(-(230 / scale[0]) * config.width);
   }
 }
