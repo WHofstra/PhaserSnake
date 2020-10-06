@@ -1,6 +1,13 @@
 const ROW_AMOUNT  = [ 20, 20 ];
 const SNAKE_COLOR = 0x91fd01;
 
+const direction = {
+  UP:    0,
+  RIGHT: 1,
+  DOWN:  2,
+  LEFT:  3
+}
+
 var config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -20,7 +27,7 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-var cursors, field, player, playerSegment;
+var cursors, field, player;
 
 function preload ()
 {
@@ -49,9 +56,6 @@ function create ()
 
   //Collisions
 
-
-  //Key Input
-
 }
 
 function update ()
@@ -78,7 +82,14 @@ function InitGrid(scene)
 function InitPlayer(scene)
 {
   player = scene.add.rectangle(field.cellWidth * (ROW_AMOUNT[0] - 1) * 1/2,
-    field.cellHeight * (ROW_AMOUNT[1] - 1) * (1/2), field.cellWidth, field.cellHeight, SNAKE_COLOR);
+      field.cellHeight * (ROW_AMOUNT[1] - 1) * (1/2), field.cellWidth, field.cellHeight, SNAKE_COLOR);
+
+  player.direction = direction.RIGHT;
+  player.speed     = field.cellWidth * 5;
+
+  scene.physics.add.existing(player);
+  player.body.collideWorldBounds = true;
+  MoveObject(player.body, player.speed, 0);
 }
 
 function AddPlayerSegment(position, direction)
@@ -98,5 +109,42 @@ function EatApple(player, apple)
 
 function KeyInput()
 {
+  //If the Up-arrow or 'W'-key is Pressed
+  if ((Phaser.Input.Keyboard.JustDown(cursors.arrowUp)      ||
+       Phaser.Input.Keyboard.JustDown(cursors.altUp))       &&
+       player.direction != direction.DOWN)
+  {
+    player.direction = direction.UP;
+    MoveObject(player.body, 0, -player.speed);
+  }
+  //If the Down-arrow or 'S'-key is Pressed
+  else if ((Phaser.Input.Keyboard.JustDown(cursors.arrowDown)    ||
+            Phaser.Input.Keyboard.JustDown(cursors.altDown))     &&
+            player.direction != direction.UP)
+  {
+    player.direction = direction.DOWN;
+    MoveObject(player.body, 0, player.speed);
+  }
+  //If the Right-arrow or 'D'-key is Pressed
+  else if ((Phaser.Input.Keyboard.JustDown(cursors.arrowRight) ||
+            Phaser.Input.Keyboard.JustDown(cursors.altRight))  &&
+            player.direction != direction.LEFT)
+  {
+    player.direction = direction.RIGHT;
+    MoveObject(player.body, player.speed, 0);
+  }
+  //If the Left-arrow or 'A'-key is Pressed
+  else if ((Phaser.Input.Keyboard.JustDown(cursors.arrowLeft) ||
+            Phaser.Input.Keyboard.JustDown(cursors.altLeft))  &&
+            player.direction != direction.RIGHT)
+  {
+    player.direction = direction.LEFT;
+    MoveObject(player.body, -player.speed, 0);
+  }
+}
 
+function MoveObject(physicsObject, velocityX, velocityY)
+{
+  physicsObject.velocity.x = velocityX;
+  physicsObject.velocity.y = velocityY;
 }
