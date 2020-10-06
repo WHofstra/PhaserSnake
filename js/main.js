@@ -19,12 +19,10 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-var cursors, field, player, tile;
+var cursors, field, player, playerSegment;
 
 function preload ()
 {
-
-
   cursors = this.input.keyboard.addKeys({
       arrowUp: 'up',
       arrowDown: 'down',
@@ -36,24 +34,21 @@ function preload ()
       altRight: 'D'
   });
 
-  field = this.add.grid(config.width / 2, config.height / 2 + 0.5, config.width, config.height + 0.5,
-     config.width / ROW_AMOUNT[0], config.height / ROW_AMOUNT[1],
+  field = this.add.grid(config.width * 1/2, config.height * 1/2, config.width,
+     config.height, config.width / ROW_AMOUNT[0], config.height / ROW_AMOUNT[1],
      0x09001a, 0x010101, 0x431d2b, 0x010101);
 
-  if (config.width > config.height) {
+  if (config.width >= config.height) {
     field.width     = field.height;
-    field.cellWidth = field.cellHeight;
-    field.x        += config.width / 8 + 175;
+    field.cellWidth = field.cellHeight / ROW_AMOUNT[0] * ROW_AMOUNT[1];
   }
   else {
     field.height     = field.width;
-    field.cellHeight = field.cellWidth;
+    field.cellHeight = field.cellWidth / ROW_AMOUNT[1] * ROW_AMOUNT[0];
   }
 
-  playerObject = {
-    color: 0x91fd01,
-    length: 1
-  }
+  playerSegment = this.add.rectangle(config.width / 2, config.height / 2,
+    field.cellWidth, field.cellHeight, 0x91fd01);
 }
 
 function create ()
@@ -89,9 +84,9 @@ function InitApples(scene)
 
 }
 
-function CollectStar(player, star)
+function EatApple(player, apple)
 {
-    //star.disableBody(true, true);
+    //apple.disableBody(true, true);
 }
 
 function KeyInput()
