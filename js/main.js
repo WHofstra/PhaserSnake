@@ -88,7 +88,10 @@ function InitPlayer(scene)
   player.speed     = field.cellWidth * 5;
 
   scene.physics.add.existing(player);
-  player.body.collideWorldBounds = true;
+  player.body.collideWorldBounds           = true;
+  player.body.customBoundsRectangle.width  = field.width;
+  player.body.customBoundsRectangle.height = field.height;
+  
   MoveObject(player.body, player.speed, 0);
 }
 
