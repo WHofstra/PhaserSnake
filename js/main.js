@@ -1,7 +1,9 @@
 const ROW_AMOUNT       = [ 20, 20 ];
-const BACKGROUND_COLOR = 0x431d2b;
-const SNAKE_COLOR      = 0x91fd01;
-const EDIBLE_COLOR     = 0xfe004f;
+const BACKGROUND_COLOR = 0x09001a,
+      GRIDLINE_COLOR   = 0x431d2b,
+      SNAKE_COLOR      = 0x91fd01,
+      EDIBLE_COLOR     = 0xfe004f;
+const SPEED_VALUE      = 5;
 
 const direction = {
   UP:    0,
@@ -29,7 +31,7 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-var cursors, field, player;
+var cursors, field, player, edible;
 var playerSegmentArray = [];
 
 function preload ()
@@ -51,13 +53,14 @@ function create ()
   ///Grid
   InitGrid(this);
 
+  //Items
+  InitEdible(this);
+
   //Player
   InitPlayer(this);
 
-  //Items
-  //InitApples(this);
-
   //Collisions
+  this.physics.add.overlap(player, edible, Eat, null, this);
 }
 
 function update ()
@@ -69,7 +72,7 @@ function InitGrid(scene)
 {
   field = scene.add.grid(config.width * 1/2, config.height * 1/2, config.width,
      config.height, config.width / ROW_AMOUNT[0], config.height / ROW_AMOUNT[1],
-     0x09001a, 0x010101, 0x431d2b, 0x010101);
+     BACKGROUND_COLOR, 0x010101, GRIDLINE_COLOR, 0x010101);
 
   if (config.width >= config.height) {
     field.width     = field.height;
@@ -84,9 +87,9 @@ function InitGrid(scene)
 function InitPlayer(scene)
 {
   player = AddPlayerSegment(new Phaser.Math.Vector2(field.cellWidth * (ROW_AMOUNT[0] - 1) * 1/2,
-                            field.cellHeight * (ROW_AMOUNT[1] - 1) * (1/2)), direction.RIGHT, scene);
+                            field.cellHeight * (ROW_AMOUNT[1] - 1) * 1/2), direction.RIGHT, scene);
   player.direction = direction.RIGHT;
-  player.speed     = field.cellWidth * 5;
+  player.speed     = field.cellWidth * SPEED_VALUE;
   MoveObject(player.body, player.speed, 0);
 }
 
@@ -103,14 +106,24 @@ function AddPlayerSegment(position, direct, scene)
   return segment;
 }
 
-function InitApples(scene)
+function InitEdible(scene)
 {
+  let randomPos = new Phaser.Math.Vector2((Math.floor(Math.random() * ROW_AMOUNT[0]) + 1/2) * field.cellWidth,
+                                          (Math.floor(Math.random() * ROW_AMOUNT[1]) + 1/2) * field.cellHeight);
 
+  edible = scene.physics.add.group({
+    key: 'apple',
+    setXY: { x: randomPos.x, y: randomPos.y }
+  });
+
+  edible.scene.add.rectangle(randomPos.x, randomPos.y, field.cellWidth,
+                             field.cellHeight, EDIBLE_COLOR);
 }
 
-function EatApple(player, apple)
+function Eat(player, apple)
 {
-    //apple.disableBody(true, true);
+  console.log("Touch");
+  apple.disableBody(true, true);
 }
 
 function KeyInput()
