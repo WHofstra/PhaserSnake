@@ -1,5 +1,7 @@
-const ROW_AMOUNT  = [ 20, 20 ];
-const SNAKE_COLOR = 0x91fd01;
+const ROW_AMOUNT       = [ 20, 20 ];
+const BACKGROUND_COLOR = 0x431d2b;
+const SNAKE_COLOR      = 0x91fd01;
+const EDIBLE_COLOR     = 0xfe004f;
 
 const direction = {
   UP:    0,
@@ -28,18 +30,19 @@ var config = {
 
 var game = new Phaser.Game(config);
 var cursors, field, player;
+var playerSegmentArray = [];
 
 function preload ()
 {
   cursors = this.input.keyboard.addKeys({
-      arrowUp: 'up',
+      arrowUp:   'up',
       arrowDown: 'down',
       arrowLeft: 'left',
       arrowRight: 'right',
-      altUp: 'W',
-      altDown: 'S',
-      altLeft: 'A',
-      altRight: 'D'
+      altUp:      'W',
+      altDown:    'S',
+      altLeft:    'A',
+      altRight:   'D'
   });
 }
 
@@ -55,7 +58,6 @@ function create ()
   //InitApples(this);
 
   //Collisions
-
 }
 
 function update ()
@@ -81,23 +83,24 @@ function InitGrid(scene)
 
 function InitPlayer(scene)
 {
-  player = scene.add.rectangle(field.cellWidth * (ROW_AMOUNT[0] - 1) * 1/2,
-      field.cellHeight * (ROW_AMOUNT[1] - 1) * (1/2), field.cellWidth, field.cellHeight, SNAKE_COLOR);
-
+  player = AddPlayerSegment(new Phaser.Math.Vector2(field.cellWidth * (ROW_AMOUNT[0] - 1) * 1/2,
+                            field.cellHeight * (ROW_AMOUNT[1] - 1) * (1/2)), direction.RIGHT, scene);
   player.direction = direction.RIGHT;
   player.speed     = field.cellWidth * 5;
-
-  scene.physics.add.existing(player);
-  player.body.collideWorldBounds           = true;
-  player.body.customBoundsRectangle.width  = field.width;
-  player.body.customBoundsRectangle.height = field.height;
-  
   MoveObject(player.body, player.speed, 0);
 }
 
-function AddPlayerSegment(position, direction)
+function AddPlayerSegment(position, direct, scene)
 {
+  let segment = scene.add.rectangle(position.x, position.y, field.cellWidth,
+                                    field.cellHeight, SNAKE_COLOR);
 
+  scene.physics.add.existing(segment);
+  segment.body.collideWorldBounds           = true;
+  segment.body.customBoundsRectangle.width  = field.width;
+  segment.body.customBoundsRectangle.height = field.height;
+
+  return segment;
 }
 
 function InitApples(scene)
@@ -113,16 +116,16 @@ function EatApple(player, apple)
 function KeyInput()
 {
   //If the Up-arrow or 'W'-key is Pressed
-  if ((Phaser.Input.Keyboard.JustDown(cursors.arrowUp)      ||
-       Phaser.Input.Keyboard.JustDown(cursors.altUp))       &&
+  if ((Phaser.Input.Keyboard.JustDown(cursors.arrowUp) ||
+       Phaser.Input.Keyboard.JustDown(cursors.altUp))  &&
        player.direction != direction.DOWN)
   {
     player.direction = direction.UP;
     MoveObject(player.body, 0, -player.speed);
   }
   //If the Down-arrow or 'S'-key is Pressed
-  else if ((Phaser.Input.Keyboard.JustDown(cursors.arrowDown)    ||
-            Phaser.Input.Keyboard.JustDown(cursors.altDown))     &&
+  else if ((Phaser.Input.Keyboard.JustDown(cursors.arrowDown) ||
+            Phaser.Input.Keyboard.JustDown(cursors.altDown))  &&
             player.direction != direction.UP)
   {
     player.direction = direction.DOWN;
