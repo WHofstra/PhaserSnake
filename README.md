@@ -2,7 +2,10 @@
 Het framework Phaser.io wordt gebruikt om een geheel eigen 'Snake'-clone game te bouwen in JavaScript en HTML5.
 
 ## Features
-Dit project is nog niet af.
+Het bevat gameplay features die je bij de echte 'Snake' ook ziet. De slang eet en wordt langer.
+Als deze de muur of zichzelf raakt, dan is deze dood.
+
+Er is nog geen voorbeeld beschikbaar.
 
 ## Leerdoelen 
 Dit project dient als een verbreding op het onderzoek naar andere frameworks en programmeertalen.
